@@ -11,9 +11,16 @@ class User(db.Model):
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
 
+    def serialize(self, email, password):
+        self.email = email
+        self.password = password
+        self.is_active = True
+        db.session.add(self)
+        db.session.commit()
+
     def serialize(self):
         return {
             "id": self.id,
             "email": self.email,
-            # do not serialize the password, its a security breach
+        # do not serialize the password, it's a security breach
         }
