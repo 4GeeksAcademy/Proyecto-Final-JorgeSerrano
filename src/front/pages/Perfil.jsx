@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useGlobalReducer } from "../hooks/useGlobalReducer";
+import  useGlobalReducer from "../hooks/useGlobalReducer";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://silver-trout-69pp5579q67qh4jqv-3001.app.github.dev";
 

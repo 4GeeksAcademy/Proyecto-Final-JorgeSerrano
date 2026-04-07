@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useGlobalReducer } from "../hooks/useGlobalReducer";
+import  useGlobalReducer from "../hooks/useGlobalReducer";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://silver-trout-69pp5579q67qh4jqv-3001.app.github.dev";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 export const Login = () => {
     const [email, setEmail] = useState("");
@@ -20,7 +20,7 @@ export const Login = () => {
         }
 
         try {
-            const response = await fetch(`https://silver-trout-69pp5579q67qh4jqv-3001.app.github.dev/api/login`, {
+            const response = await fetch(`${BACKEND_URL}/api/login`, {
                 method: "POST",
                 body: JSON.stringify({ email, password }),
                 headers: {

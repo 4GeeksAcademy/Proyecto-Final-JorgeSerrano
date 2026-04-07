@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://silver-trout-69pp5579q67qh4jqv-3001.app.github.dev";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 export const Register = () => {
     const [email, setEmail] = useState("");
@@ -19,7 +19,7 @@ export const Register = () => {
         }
 
         try {
-            const response = await fetch(`https://silver-trout-69pp5579q67qh4jqv-3001.app.github.dev/api/register`, {
+            const response = await fetch(`${BACKEND_URL}/api/register`, {
                 method: "POST",
                 body: JSON.stringify({ email, password, nombre }),
                 headers: {

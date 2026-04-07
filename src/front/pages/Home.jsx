@@ -1,52 +1,83 @@
-import React, { useEffect } from "react"
-import rigoImageUrl from "../assets/img/rigo-baby.jpg";
-import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+
+const API_URL = "https://devsapihub.com/api-ecommerce";
 
 export const Home = () => {
+    const [featured, setFeatured] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-	const { store, dispatch } = useGlobalReducer()
+    useEffect(() => {
+        fetch(API_URL)
+            .then(res => res.json())
+            .then(data => {
+                setFeatured(data.slice(0, 4));
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error("Error:", err);
+                setLoading(false);
+            });
+    }, []);
 
-	const loadMessage = async () => {
-		try {
-			const backendUrl = import.meta.env.VITE_BACKEND_URL
+    return (
+        <>
+            <section className="hero">
+                <div className="hero__content">
+                    <p className="hero__subtitle">Nueva colección 2026</p>
+                    <h1 className="hero__title">DEFINE TU ESTILO</h1>
+                    <p className="hero__desc">
+                        Descubre las últimas tendencias en moda urbana. Prendas diseñadas para quienes no siguen reglas.
+                    </p>
+                    <Link to="/catalogo" className="hero__cta">Ver catálogo</Link>
+                </div>
+            </section>
 
-			if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file")
+            <section className="section">
+                <div className="section__header">
+                    <h2 className="section__title">Destacados</h2>
+                    <Link to="/catalogo" className="section__link">Ver todo →</Link>
+                </div>
 
-			const response = await fetch(backendUrl + "/api/hello")
-			const data = await response.json()
+                {loading ? (
+                    <div className="loading">
+                        <div className="loading__spinner"></div>
+                        <span className="loading__text">Cargando</span>
+                    </div>
+                ) : (
+                    <div className="product-grid">
+                        {featured.map(product => (
+                            <Link to={`/producto/${product.id}`} className="product-card" key={product.id}>
+                                <div className="product-card__img-wrapper">
+                                    {product.isFreeShipping && (
+                                        <span className="product-card__badge">Envío gratis</span>
+                                    )}
+                                    <img
+                                        src={product.img}
+                                        alt={product.title}
+                                        className="product-card__img"
+                                    />
+                                </div>
+                                <div className="product-card__info">
+                                    <p className="product-card__style">{product.style}</p>
+                                    <h3 className="product-card__title">{product.title}</h3>
+                                    <p className="product-card__price">
+                                        {product.currency.format}{product.price.toFixed(2)}
+                                    </p>
+                                    {product.installments > 0 && (
+                                        <p className="product-card__installments">
+                                            o {product.installments}x de {product.currency.format}
+                                            {(product.price / product.installments).toFixed(2)}
+                                        </p>
+                                    )}
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </section>
+        </>
+    );
+};
 
-			if (response.ok) dispatch({ type: "set_hello", payload: data.message })
-
-			return data
-
-		} catch (error) {
-			if (error.message) throw new Error(
-				`Could not fetch the message from the backend.
-				Please check if the backend is running and the backend port is public.`
-			);
-		}
-
-	}
-
-	useEffect(() => {
-		loadMessage()
-	}, [])
-
-	return (
-		<div className="text-center mt-5">
-			<h1 className="display-4">Hello Rigo!!</h1>
-			<p className="lead">
-				<img src={rigoImageUrl} className="img-fluid rounded-circle mb-3" alt="Rigo Baby" />
-			</p>
-			<div className="alert alert-info">
-				{store.message ? (
-					<span>{store.message}</span>
-				) : (
-					<span className="text-danger">
-						Loading message from the backend (make sure your python 🐍 backend is running)...
-					</span>
-				)}
-			</div>
-		</div>
-	);
-}; 
+export default Home;
