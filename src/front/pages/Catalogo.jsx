@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 const API_URL = "https://devsapihub.com/api-ecommerce";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 export const Catalogo = () => {
     const [productos, setProductos] = useState([]);
@@ -33,6 +34,14 @@ export const Catalogo = () => {
         e.preventDefault();
         e.stopPropagation();
         dispatch({ type: "agregar_al_carrito", payload: producto });
+        const token = localStorage.getItem("token");
+        if (token) {
+            fetch(`${BACKEND_URL}/api/carrito`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                body: JSON.stringify(producto),
+            }).catch(() => {});
+        }
     };
 
     if (loading) {

@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 export const Carrito = () => {
     const { store, dispatch } = useGlobalReducer();
     const { carrito } = store;
+    const navigate = useNavigate();
 
     const [modalAbierto, setModalAbierto] = useState(false);
     const [pagado, setPagado] = useState(false);
@@ -18,14 +21,75 @@ export const Carrito = () => {
     });
     const [errores, setErrores] = useState({});
 
+    const token = localStorage.getItem("token");
+    const estaLogueado = !!token;
+
     const total = carrito.reduce((sum, item) => sum + item.price * (item.cantidad || 1), 0);
 
-    const handleCantidad = (id, nuevaCantidad) => {
+    // Cargar carrito desde BD al montar (solo si está logueado)
+    useEffect(() => {
+        if (!estaLogueado) return;
+
+        fetch(`${BACKEND_URL}/api/carrito`, {
+            headers: { Authorization: "Bearer " + token },
+        })
+            .then(res => res.json())
+            .then(items => {
+                // Normalizar campos al formato que usa el store
+                const normalizado = items.map(item => ({
+                    id: item.producto_id,
+                    _carrito_id: item.id,
+                    title: item.titulo,
+                    price: item.precio,
+                    img: item.imagen,
+                    cantidad: item.cantidad,
+                    tallaSeleccionada: item.talla,
+                    style: item.style || "",
+                }));
+                dispatch({ type: "cargar_carrito", payload: normalizado });
+            })
+            .catch(() => {});
+    }, [estaLogueado]);
+
+    const handleCantidad = async (id, nuevaCantidad) => {
         if (nuevaCantidad < 1) {
             dispatch({ type: "quitar_del_carrito", payload: id });
+            if (estaLogueado) {
+                const item = carrito.find(i => i.id === id);
+                if (item?._carrito_id) {
+                    await fetch(`${BACKEND_URL}/api/carrito/${item._carrito_id}`, {
+                        method: "DELETE",
+                        headers: { Authorization: "Bearer " + token },
+                    }).catch(() => {});
+                }
+            }
             return;
         }
         dispatch({ type: "actualizar_cantidad", payload: { id, cantidad: nuevaCantidad } });
+        if (estaLogueado) {
+            const item = carrito.find(i => i.id === id);
+            if (item?._carrito_id) {
+                await fetch(`${BACKEND_URL}/api/carrito/${item._carrito_id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + token,
+                    },
+                    body: JSON.stringify({ cantidad: nuevaCantidad }),
+                }).catch(() => {});
+            }
+        }
+    };
+
+    const handleEliminar = async (id) => {
+        const item = carrito.find(i => i.id === id);
+        dispatch({ type: "quitar_del_carrito", payload: id });
+        if (estaLogueado && item?._carrito_id) {
+            await fetch(`${BACKEND_URL}/api/carrito/${item._carrito_id}`, {
+                method: "DELETE",
+                headers: { Authorization: "Bearer " + token },
+            }).catch(() => {});
+        }
     };
 
     const handleChange = (e) => {
@@ -54,19 +118,58 @@ export const Carrito = () => {
         return nuevosErrores;
     };
 
-    const handlePagar = (e) => {
+    const handlePagar = async (e) => {
         e.preventDefault();
         const erroresValidacion = validar();
         if (Object.keys(erroresValidacion).length > 0) {
             setErrores(erroresValidacion);
             return;
         }
+
+        if (!estaLogueado) {
+            navigate("/login");
+            return;
+        }
+
         setCargando(true);
-        setTimeout(() => {
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/pedidos`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token,
+                },
+                body: JSON.stringify({
+                    items: carrito.map(item => ({
+                        id: item.id,
+                        titulo: item.title,
+                        precio: item.price,
+                        imagen: item.img,
+                        cantidad: item.cantidad || 1,
+                        talla: item.tallaSeleccionada,
+                    })),
+                    total: total,
+                    pago: {
+                        nombre: form.nombre,
+                        email: form.email,
+                        tarjeta: form.tarjeta.replace(/\s/g, ""),
+                    },
+                }),
+            });
+
+            if (response.ok) {
+                dispatch({ type: "vaciar_carrito" });
+                setPagado(true);
+            } else {
+                const data = await response.json();
+                setErrores({ general: data.msg || "Error al procesar el pago" });
+            }
+        } catch {
+            setErrores({ general: "No se pudo conectar con el servidor" });
+        } finally {
             setCargando(false);
-            setPagado(true);
-            dispatch({ type: "vaciar_carrito" });
-        }, 1800);
+        }
     };
 
     const cerrarModal = () => {
@@ -96,6 +199,9 @@ export const Carrito = () => {
                             <div className="cart__item-info">
                                 <h3 className="cart__item-title">{item.title}</h3>
                                 <p className="cart__item-style">{item.style}</p>
+                                {item.tallaSeleccionada && (
+                                    <p className="cart__item-style">Talla: {item.tallaSeleccionada}</p>
+                                )}
                                 <div className="cart__item-qty">
                                     <button
                                         className="cart__qty-btn"
@@ -113,7 +219,7 @@ export const Carrito = () => {
                                 </div>
                                 <button
                                     className="cart__item-remove"
-                                    onClick={() => dispatch({ type: "quitar_del_carrito", payload: item.id })}
+                                    onClick={() => handleEliminar(item.id)}
                                 >
                                     Eliminar
                                 </button>
@@ -142,7 +248,7 @@ export const Carrito = () => {
                                 <div className="checkout-modal__success-icon">✓</div>
                                 <h2 className="checkout-modal__success-title">¡Pago completado!</h2>
                                 <p className="checkout-modal__success-text">
-                                    Tu pedido ha sido procesado correctamente. Recibirás un email de confirmación en breve.
+                                    Tu pedido ha sido procesado correctamente. Puedes verlo en tu perfil.
                                 </p>
                                 <Link to="/catalogo" className="checkout-modal__btn" onClick={cerrarModal}>
                                     Seguir comprando
@@ -157,6 +263,11 @@ export const Carrito = () => {
                                 <div className="checkout-modal__total">
                                     Total a pagar: <strong>€{total.toFixed(2)}</strong>
                                 </div>
+                                {errores.general && (
+                                    <div style={{ color: "red", marginBottom: "8px", textAlign: "center" }}>
+                                        {errores.general}
+                                    </div>
+                                )}
                                 <form className="checkout-modal__form" onSubmit={handlePagar}>
                                     <div className="checkout-field">
                                         <label className="checkout-field__label">Nombre completo</label>

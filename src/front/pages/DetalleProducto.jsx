@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 const API_URL = "https://devsapihub.com/api-ecommerce";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 export const DetalleProducto = () => {
     const { id } = useParams();
@@ -32,6 +33,14 @@ export const DetalleProducto = () => {
             type: "agregar_al_carrito",
             payload: { ...producto, tallaSeleccionada }
         });
+        const token = localStorage.getItem("token");
+        if (token) {
+            fetch(`${BACKEND_URL}/api/carrito`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                body: JSON.stringify({ ...producto, tallaSeleccionada }),
+            }).catch(() => {});
+        }
         setAdded(true);
         setTimeout(() => setAdded(false), 2000);
     };
