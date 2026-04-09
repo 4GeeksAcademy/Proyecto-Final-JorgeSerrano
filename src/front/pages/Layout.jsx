@@ -5,7 +5,7 @@ import { Footer } from "../components/Footer";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { useEffect } from "react";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://silver-trout-69pp5579q67qh4jqv-3001.app.github.dev";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 export const Layout = () => {
     const { dispatch } = useGlobalReducer();
@@ -28,6 +28,7 @@ export const Layout = () => {
                     dispatch({ type: "set_user", payload: data.user });
                 } else {
                     localStorage.removeItem("token");
+                    dispatch({ type: "logout" });
                 }
             } catch (error) {
                 console.error("Error conectando con el backend:", error);

@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_jwt_extended import JWTManager
+from datetime import timedelta
 from flask_cors import CORS
 from api.utils import APIException, generate_sitemap
 from api.models import db, bcrypt
@@ -35,6 +36,7 @@ MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
 bcrypt.init_app(app)
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "super-secret-key")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
 jwt = JWTManager(app)
 
 # add the admin

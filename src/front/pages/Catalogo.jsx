@@ -8,18 +8,23 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 export const Catalogo = () => {
     const [productos, setProductos] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [filtro, setFiltro] = useState("Todos");
     const { dispatch } = useGlobalReducer();
 
     useEffect(() => {
         fetch(API_URL)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
             .then(data => {
                 setProductos(data);
                 setLoading(false);
             })
             .catch(err => {
-                console.error("Error:", err);
+                console.error("Error al cargar catálogo:", err);
+                setError(err.message);
                 setLoading(false);
             });
     }, []);

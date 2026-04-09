@@ -14,6 +14,9 @@ import { Catalogo } from "./pages/Catalogo";
 import { DetalleProducto } from "./pages/DetalleProducto";
 import { Carrito } from "./pages/Carrito";
 import { Perfil } from "./pages/Perfil";
+import Envíos from "./pages/Envíos";
+import Devoluciones from "./pages/Devoluciones";
+import Contacto from "./pages/Contacto";
 
 const RutaProtegida = ({ children }) => {
     const token = localStorage.getItem("token");
@@ -31,6 +34,9 @@ export const router = createBrowserRouter(
             <Route path="producto/:id" element={<DetalleProducto />} />
             <Route path="carrito" element={<Carrito />} />
             <Route path="perfil" element={<RutaProtegida><Perfil /></RutaProtegida>} />
+            <Route path="envíos" element={<Envíos />} />
+            <Route path="devoluciones" element={<Devoluciones />} />
+            <Route path="contacto" element={<Contacto />} />  
         </Route>
     )
 );

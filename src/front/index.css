@@ -12,16 +12,17 @@ body {
 
 /* NAVBAR */
 .nav {
-  background: #222;
+  background: white;
   padding: 0 24px;
   height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-bottom: 3px solid #000;
 }
 
 .nav__logo {
-  color: white;
+  color: black;
   text-decoration: none;
   font-size: 20px;
   font-weight: bold;
@@ -68,7 +69,7 @@ body {
 
 /* HERO */
 .hero {
-  background: #222;
+  background: #77b1d4;
   color: white;
   text-align: center;
   padding: 80px 24px;
@@ -76,7 +77,7 @@ body {
 
 .hero__subtitle {
   font-size: 13px;
-  color: #aaa;
+  color: white;
   margin-bottom: 12px;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -90,7 +91,7 @@ body {
 
 .hero__desc {
   font-size: 16px;
-  color: #aaa;
+  color: white;
   margin-bottom: 32px;
 }
 
@@ -171,7 +172,7 @@ body {
 }
 
 .product-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .product-card__img-wrapper {
@@ -496,7 +497,7 @@ body {
 .checkout-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 200;
   display: flex;
   align-items: center;
@@ -760,7 +761,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading__text {
@@ -770,7 +773,7 @@ body {
 
 /* FOOTER */
 .footer {
-  background: #222;
+  background: #77b1d4;
   color: white;
   padding: 40px 24px 24px;
   margin-top: 48px;
@@ -793,7 +796,7 @@ body {
 
 .footer__desc {
   font-size: 13px;
-  color: #aaa;
+  color: white;
   line-height: 1.6;
 }
 
@@ -803,12 +806,12 @@ body {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 14px;
-  color: #aaa;
+  color: white;
 }
 
 .footer__col a {
   display: block;
-  color: #ccc;
+  color: white;
   text-decoration: none;
   font-size: 13px;
   margin-bottom: 8px;
@@ -819,7 +822,7 @@ body {
 }
 
 .footer__bottom {
-  border-top: 1px solid #444;
+  border-top: 1px solid white;
   padding-top: 20px;
   text-align: center;
   font-size: 12px;
@@ -830,12 +833,20 @@ body {
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-  .nav { padding: 0 16px; }
-  .nav__links { gap: 16px; }
+  .nav {
+    padding: 0 16px;
+  }
+  .nav__links {
+    gap: 16px;
+  }
 
-  .hero__title { font-size: 36px; }
+  .hero__title {
+    font-size: 36px;
+  }
 
-  .section { padding: 32px 16px; }
+  .section {
+    padding: 32px 16px;
+  }
 
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -848,7 +859,9 @@ body {
     padding: 32px 16px;
   }
 
-  .cart { padding: 32px 16px; }
+  .cart {
+    padding: 32px 16px;
+  }
 
   .footer__grid {
     grid-template-columns: 1fr;

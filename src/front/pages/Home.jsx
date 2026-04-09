@@ -62,12 +62,11 @@ export const Home = () => {
                                     <p className="product-card__style">{product.style}</p>
                                     <h3 className="product-card__title">{product.title}</h3>
                                     <p className="product-card__price">
-                                        {product.currency.format}{product.price.toFixed(2)}
+                                        €{product.price.toFixed(2)}
                                     </p>
                                     {product.installments > 0 && (
                                         <p className="product-card__installments">
-                                            o {product.installments}x de {product.currency.format}
-                                            {(product.price / product.installments).toFixed(2)}
+                                            o {product.installments}x de €{(product.price / product.installments).toFixed(2)}
                                         </p>
                                     )}
                                 </div>

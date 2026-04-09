@@ -24,9 +24,9 @@ export const Footer = () => {
                 </div>
                 <div className="footer__col">
                     <div className="footer__col-title">Ayuda</div>
-                    <a href="#">Envíos</a>
-                    <a href="#">Devoluciones</a>
-                    <a href="#">Contacto</a>
+                    <Link to="/envíos">Envíos</Link>
+                    <Link to="/devoluciones">Devoluciones</Link>
+                    <Link to="/contacto">Contacto</Link>
                 </div>
             </div>
             <div className="footer__bottom">

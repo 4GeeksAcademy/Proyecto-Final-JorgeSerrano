@@ -276,6 +276,23 @@ def get_pedido(pedido_id):
     return jsonify(pedido.serialize()), 200
 
 
+@api.route('/pedidos/<int:pedido_id>', methods=['PUT'])
+@jwt_required()
+def update_pedido(pedido_id):
+    user_id = int(get_jwt_identity())
+    pedido = db.session.get(Pedido, pedido_id)
+
+    if not pedido or pedido.user_id != user_id:
+        return jsonify({"msg": "Pedido not found"}), 404
+
+    data = request.get_json()
+    if "estado" in data:
+        pedido.estado = data["estado"]
+
+    db.session.commit()
+    return jsonify(pedido.serialize()), 200
+
+
 @api.route('/pedidos/<int:pedido_id>', methods=['DELETE'])
 @jwt_required()
 def delete_pedido(pedido_id):

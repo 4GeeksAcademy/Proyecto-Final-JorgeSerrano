@@ -24,6 +24,9 @@ export default function storeReducer(store, action = {}) {
     case 'set_user':
       return { ...store, user: action.payload };
 
+    case 'logout':
+      return { ...store, user: null };
+
     case 'cargar_carrito': {
       guardarCarrito(action.payload);
       return { ...store, carrito: action.payload };

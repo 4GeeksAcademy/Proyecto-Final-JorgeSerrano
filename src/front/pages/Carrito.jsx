@@ -33,9 +33,16 @@ export const Carrito = () => {
         fetch(`${BACKEND_URL}/api/carrito`, {
             headers: { Authorization: "Bearer " + token },
         })
-            .then(res => res.json())
+            .then(res => {
+                if (res.status === 401 || res.status === 422) {
+                    localStorage.removeItem("token");
+                    dispatch({ type: "logout" });
+                    return null;
+                }
+                return res.json();
+            })
             .then(items => {
-                // Normalizar campos al formato que usa el store
+                if (!items || !Array.isArray(items)) return;
                 const normalizado = items.map(item => ({
                     id: item.producto_id,
                     _carrito_id: item.id,
