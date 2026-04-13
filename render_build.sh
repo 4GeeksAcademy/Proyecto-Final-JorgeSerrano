@@ -5,6 +5,7 @@ set -o errexit
 npm install
 npm run build
 
-pipenv install Flask-JWT-Extended
+pip install pipenv
+pipenv install
 
-pipenv run upgrade
+pipenv run flask db upgrade
